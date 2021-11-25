@@ -1,13 +1,16 @@
 import mysql.connector as conector
 import requests
 from bs4 import BeautifulSoup
+from tkinter import *
+from tkinter import ttk
 
 
 def cargar_todas_paginas():
     soups = []
     num_pag = 0
     for a in range(71):
-        url_todas = "https://www.ufcespanol.com/athletes/all?filters%5B0%5D=status%3A23&gender=All&search=&page=" + str(num_pag) + '"'
+        url_todas = "https://www.ufcespanol.com/athletes/all?filters%5B0%5D=status%3A23&gender=All&search=&page=" + str(
+            num_pag) + '"'
         pagina = requests.get(url_todas)
         soup = BeautifulSoup(pagina.text, "html.parser")
         soups.append(soup)
@@ -79,8 +82,6 @@ def cargar_datos():
             # Guardamos el diccionario en una lista para guardar a todos los luchadores
             lista_datos_luchadores.append(luchadores_datos)
 
-
-
     return lista_datos_luchadores
 
 
@@ -131,6 +132,60 @@ def consultar_datos():
     return lista_datos_luchadores
 
 
+def ventana_mostrar():
+    ventana2 = Tk()
+    menu_ventana = Menu(ventana2)
+    ventana2.title("Ventana para mostrar los datos")
+    ventana2.config(menu=menu_ventana)
+    ventana2.geometry("800x400")
+    ventana2.resizable(True, True)
+    luchadores = consultar_datos()
+    tv = ttk.Treeview(ventana2)
 
-consultar_datos()
+    tv['columns'] = ("id", "nombre", "apodo", "peso", "ratio", "cara")
 
+    tv.column("#0", width=0, anchor=CENTER)
+    tv.column("id", width=40, anchor=CENTER)
+    tv.column("nombre", width=100, anchor=CENTER)
+    tv.column("apodo", width=100, anchor=CENTER)
+    tv.column("peso", width=100, anchor=CENTER)
+    tv.column("ratio", width=100, anchor=CENTER)
+    tv.column("cara", width=100, anchor=CENTER)
+
+    tv.heading("#0", text="", anchor=CENTER)
+    tv.heading("id", text="Id", anchor=CENTER)
+    tv.heading("nombre", text="Nombre", anchor=CENTER)
+    tv.heading("apodo", text="Apodo", anchor=CENTER)
+    tv.heading("peso", text="Peso", anchor=CENTER)
+    tv.heading("ratio", text="Ratio", anchor=CENTER)
+    tv.heading("cara", text="Cara", anchor=CENTER)
+
+    tv.pack()
+    ventana2.mainloop()
+
+
+def aplicacion_luchadores():
+    root = Tk()
+    menu_principal = Menu(root)
+    root.title("Luchadores UFC")
+    root.config(menu=menu_principal)
+    root.geometry("800x0")
+    root.resizable(True, True)
+
+    barra_menu = Menu(menu_principal, tearoff=0)
+    barra_menu1 = Menu(menu_principal, tearoff=0)
+    barra_menu2 = Menu(menu_principal, tearoff=0)
+
+    menu_principal.add_cascade(label="Cargar", menu=barra_menu)
+    barra_menu.add_command(label="Luchadores", command=lambda: insertar_datos())
+
+    menu_principal.add_cascade(label="Eliminar", menu=barra_menu1)
+    barra_menu1.add_command(label="Luchadores", command=lambda: eliminar_datos())
+
+    menu_principal.add_cascade(label="Mostrar", menu=barra_menu2)
+    barra_menu2.add_command(label="Luchadores", command=lambda: ventana_mostrar())
+
+    root.mainloop()
+
+
+aplicacion_luchadores()
